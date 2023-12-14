@@ -5,7 +5,6 @@ output: html_document
 date: "2023-10-17"  
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(include = TRUE, message = FALSE, warning = FALSE)
 ```
@@ -65,7 +64,7 @@ We will be working observations of birds from 2021 onward.
 
 Load relevant packages.
 
-```{r}
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 library(tidyverse)
 library(sf)
 library(here)
@@ -78,14 +77,14 @@ library(gt)
 
 Read in EJScreen data and filter to Los Angeles County (5 points)
 
-```{r}
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 la_data <- st_read(here("data", "EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb")) %>% 
   filter(CNTY_NAME == "Los Angeles County")
 ```
 
 Make a map of wastewater discharge by census block groups. Indicate which census block groups are above the 95th percentile of national values for wastewater discharge by adding a centroid. (10 points)
 
-```{r }
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 wastewater_above95 <- la_data %>% 
   filter(P_PWDIS > 95)
 
@@ -130,7 +129,7 @@ answer2
 Import redlining information for Los Angeles.
 
 ```{r }
-LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/downloads/geojson/CALosAngeles1939.geojson") %>%
+LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/citiesData/CALosAngeles1939/geojson.json") %>%
   st_make_valid()
 
 LA_county <- st_read(here("data/los-angeles-county.geojson")) %>%
@@ -142,7 +141,7 @@ Make a map of historical redlining boundaries, colored by HOLC grade. (5 points)
 ```{r }
 map2 <- ggplot() +
   geom_sf(data = LA_county) +
-  geom_sf(data = LA_redlining, aes(fill = holc_grade)) +
+  geom_sf(data = LA_redlining, aes(fill = grade)) +
   coord_sf(expand = TRUE) +
     annotation_scale(data = LA_county, location = "br") +
     theme_linedraw() +
@@ -183,8 +182,8 @@ Summarize current conditions based on EJScreen data within historical redlining 
 
 ```{r }
 summarize_la <- st_join(x = la_data_4326, y = LA_redlining) %>% 
-  group_by(holc_grade) %>% 
-  filter(!is.na(holc_grade)) %>% 
+  group_by(grade) %>% 
+  filter(!is.na(grade)) %>% 
   summarize("LowIncPct Mean" = mean(LOWINCPCT, na.rm = TRUE),
             "P_PM25 Mean" = mean(P_PM25, na.rm = TRUE),
             "P_LifeExpPct Mean" = mean(P_LIFEEXPPCT, na.rm = TRUE),
@@ -219,15 +218,15 @@ st_crs(LA_redlining)
 birds_redlining_joined <- st_join(x = birds, y = LA_redlining, join = st_within)
 
 bird_byholc <- birds_redlining_joined %>% 
-    group_by(holc_grade) %>% 
-    drop_na(holc_grade) %>% 
+    group_by(grade) %>% 
+    drop_na(grade) %>% 
     summarize(bird_count = n()) %>% 
     mutate(bird_total = sum(bird_count)) %>% 
     mutate(bird_percent = (bird_count / bird_total)*100)
 
 
 answer5 <- ggplot(data = bird_byholc, 
-                  aes(x = holc_grade, y = bird_percent, fill = holc_grade)) +
+                  aes(x = grade, y = bird_percent, fill = grade)) +
   geom_col() +
   labs(title = "Percentage of Birds within LA Redlining boundaries by HOLC Grade",
        y = "Bird %",
