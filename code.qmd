@@ -128,7 +128,7 @@ answer2
 
 Import redlining information for Los Angeles.
 
-```{r }
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/citiesData/CALosAngeles1939/geojson.json") %>%
   st_make_valid()
 
@@ -157,7 +157,7 @@ ggplotly(map2)
 
 Find the number of census block groups that fall within areas with HOLC grades hint: make sure the CRS match (15 points)
 
-```{r }
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 la_data_4326 <- st_transform(la_data, crs = "EPSG: 4326")
 
 st_crs(la_data_4326)
@@ -207,7 +207,7 @@ Answer: The effects of redlining can still be seen today as evidenced by the env
 
 For bird observations from 2022 that fall within neighborhoods with HOLC grads, find the percent of observations within each redlining categories and plot results. hint: make sure that the bird observations have the same CRS as redlining data. (20 points)
 
-```{r}
+```{r include=TRUE, warning=FALSE, message=FALSE, results = FALSE}
 
 birds <- st_read(here("data/gbif-birds-LA/gbif-birds-LA.shp")) %>%
  filter(year == 2022) # since question says from year 2022
